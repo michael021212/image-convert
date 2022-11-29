@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/chai2010/webp"
+	"golang.org/x/image/webp"
 )
 
 // 後述するSubImageメソッドによるトリミングのために用意
@@ -42,11 +42,16 @@ func main() {
 	assert(err, "パスが不正です '"+inputPath+"'")
 	defer inputFile.Close() // リソース破棄のためにdeferを使ってファイルをクローズする。deferを使うことで関数終了時に実行される
 
-	// Decodeでファイルオブジェクトを画像オブジェクトに変換。戻り値はImage型とstring型とerror型
+	// image.Decodeでファイルオブジェクトを画像オブジェクトに変換。戻り値はImage型とstring型とerror型
 	// Image型は、形式によって*image.YCbCr型だったり*image.NRGBA型だったりする
 	// JPEGの場合はRGBでなくYCbCrで保存し、PNGの場合はNRGBAかRGBAで保存するらしいがこの辺よくわかっていません
 	// string型は、"png"や"jpg"だったりするが、今回は不要なのでアンダースコア変数で無視する
-	inputImg, _, err := image.Decode(inputFile)
+	var inputImg image.Image // if文の中で変数の代入ができないので先に宣言する
+	if strings.ToLower(filepath.Ext(inputPath)) == ".webp" {
+		inputImg, err = webp.Decode(inputFile)
+	} else {
+		inputImg, _, err = image.Decode(inputFile)
+	}
 	assert(err, "画像データとして読み込めません")
 
 	// Bounds()の戻り値はRectangle型。Dx()はRectangle型のクラスメソッドで幅を取得する
@@ -130,9 +135,6 @@ func main() {
 		fmt.Println("出力完了！")
 	case ".gif":
 		gif.Encode(outputFile, trimmedImg, nil)
-		fmt.Println("出力完了！")
-	case ".webp":
-		webp.Encode(outputFile, trimmedImg, &webp.Options{Lossless: true})
 		fmt.Println("出力完了！")
 	default:
 		fmt.Println("拡張子が対応していません (対応拡張子: jpeg/jpg/png/gif)")
