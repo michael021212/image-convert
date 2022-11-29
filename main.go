@@ -24,10 +24,10 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	// 出力画像の幅と高さをpxで指定
-	fmt.Print("トリミング後画像の幅をpxで入力してください >>")
+	fmt.Print("トリミング後画像の幅をpxで入力してください(省略すると元画像と同じ大きさになります) >>")
 	scanner.Scan()
 	OUTPUT_WIDTH, _ := strconv.Atoi(scanner.Text())
-	fmt.Print("トリミング後画像の高さをpxで入力してください >>")
+	fmt.Print("トリミング後画像の高さをpxで入力してください(省略すると元画像と同じ大きさになります) >>")
 	scanner.Scan()
 	OUTPUT_HEIGHT, _ := strconv.Atoi(scanner.Text())
 
@@ -61,22 +61,48 @@ func main() {
 	scanner.Scan()
 	ySlide, _ := strconv.Atoi(scanner.Text())
 
-	// 切り取りに使う座標を計算
-	x1, y1 := 0, 0
-
+	// 切り取りに使う座標を計算する処理
+	// if OUTPUT_(WIDTH/HEIGHT) == 0 の条件分岐は、トリミング後画像の幅が未指定の場合は元画像と同じ大きさで出力するための記述
+	x1, x2, y1, y2 := 0, 0, 0, 0
 	if xSlide != 0 {
-		x1 = ((inputWidth - OUTPUT_WIDTH) / 2) + xSlide
+		if OUTPUT_WIDTH == 0 {
+			x1 = 0 + xSlide
+		} else {
+			x1 = ((inputWidth - OUTPUT_WIDTH) / 2) + xSlide
+		}
 	} else {
-		x1 = (inputWidth - OUTPUT_WIDTH) / 2
+		if OUTPUT_WIDTH == 0 {
+			x1 = 0
+		} else {
+			x1 = (inputWidth - OUTPUT_WIDTH) / 2
+		}
 	}
-	x2 := x1 + OUTPUT_WIDTH
+
+	if OUTPUT_WIDTH == 0 {
+		x2 = inputWidth
+	} else {
+		x2 = x1 + OUTPUT_WIDTH
+	}
 
 	if ySlide != 0 {
-		y1 = ((inputHeight - OUTPUT_HEIGHT) / 2) - ySlide
+		if OUTPUT_HEIGHT == 0 {
+			y1 = 0 + ySlide
+		} else {
+			y1 = ((inputHeight - OUTPUT_HEIGHT) / 2) + ySlide
+		}
 	} else {
-		y1 = (inputHeight - OUTPUT_HEIGHT) / 2
+		if OUTPUT_HEIGHT == 0 {
+			y1 = 0
+		} else {
+			y1 = (inputHeight - OUTPUT_HEIGHT) / 2
+		}
 	}
-	y2 := y1 + OUTPUT_HEIGHT
+
+	if OUTPUT_HEIGHT == 0 {
+		y2 = inputHeight
+	} else {
+		y2 = y1 + OUTPUT_HEIGHT
+	}
 
 	// Imageインターフェース(image.Image)にはSubImageメソッドがないので、
 	// SubImagerインターフェースを作って型アサーションすることでSubImageメソッドを使えるようにしている
