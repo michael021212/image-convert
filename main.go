@@ -58,11 +58,11 @@ func main() {
 	inputWidth := inputImg.Bounds().Dx()
 	inputHeight := inputImg.Bounds().Dy()
 
-	fmt.Println("デフォルトのトリミング位置は画像の中央です")
-	fmt.Print("トリミング位置を右に50px変更したい場は「50」、左に50px変更したい場は「-50」と入力してください(省略可) >>")
+	fmt.Println("デフォルトのトリミング範囲は画像の中央です")
+	fmt.Print("トリミング範囲を右に50px変更したい場は「50」、左に50px変更したい場は「-50」と入力してください(省略可) >>")
 	scanner.Scan()
 	xSlide, _ := strconv.Atoi(scanner.Text())
-	fmt.Print("トリミング位置を上に50px変更したい場は「50」、下に50px変更したい場は「-50」と入力してください(省略可) >>")
+	fmt.Print("トリミング範囲を上に50px変更したい場は「50」、下に50px変更したい場は「-50」と入力してください(省略可) >>")
 	scanner.Scan()
 	ySlide, _ := strconv.Atoi(scanner.Text())
 
