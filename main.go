@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/chai2010/webp"
 )
 
 // 後述するSubImageメソッドによるトリミングのために用意
@@ -32,10 +34,10 @@ func main() {
 	// 入力画像パス
 	fmt.Print("画像ファイルのパスを拡張子付きで入力してください >>")
 	scanner.Scan()
-	inputPath := scanner.Text()
+	iPath := scanner.Text()
+	inputPath := strings.Replace(iPath, `"`, "", -1) // windowsでファイルのパスをコピーするとデフォルトでダブルクォーテーションがつくので除去するように
 
 	// 画像ファイルを開く。戻り値は*os.File型とerror型
-	// 例: /Users/tanakashun/Desktop/かに/満腹セット.png
 	inputFile, err := os.Open(inputPath)
 	assert(err, "パスが不正です '"+inputPath+"'")
 	defer inputFile.Close() // リソース破棄のためにdeferを使ってファイルをクローズする。deferを使うことで関数終了時に実行される
@@ -84,10 +86,10 @@ func main() {
 	// 出力画像パス
 	fmt.Print("出力ファイルのパスを拡張子付きで入力してください >>")
 	scanner.Scan()
-	outputPath := scanner.Text()
+	oPath := scanner.Text()
+	outputPath := strings.Replace(oPath, `"`, "", -1) // windowsでファイルのパスをコピーするとデフォルトでダブルクォーテーションがつくので除去するように
 
 	// 出力ファイルを生成
-	// outputFile, err := os.Create("/Users/tanakashun/Desktop/かに/ooo.jpg")
 	outputFile, err := os.Create(outputPath)
 	assert(err, "ファイルの作成に失敗しました '"+outputPath+"'")
 	defer outputFile.Close()
@@ -102,6 +104,9 @@ func main() {
 		fmt.Println("出力完了！")
 	case ".gif":
 		gif.Encode(outputFile, trimmedImg, nil)
+		fmt.Println("出力完了！")
+	case ".webp":
+		webp.Encode(outputFile, trimmedImg, &webp.Options{Lossless: true})
 		fmt.Println("出力完了！")
 	default:
 		fmt.Println("拡張子が対応していません (対応拡張子: jpeg/jpg/png/gif)")
